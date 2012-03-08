@@ -3,7 +3,7 @@ Contributors: l3rady
 Donate link: http://l3rady.com/donate
 Tags: plugin, posts, page, content, snippets, content
 Requires at least: 3.1
-Tested up to: 3.2.1
+Tested up to: 3.3.1
 Stable tag: 0.1.1
 
 Snippets of content that is stored in a custom post type. Content can be included into posts/pages/templates via shortcodes or template tags.

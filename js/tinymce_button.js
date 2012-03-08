@@ -3,21 +3,31 @@
 	tinymce.create('tinymce.plugins.scScraps',
 	{
 		init : function(ed, url) {
-            ed.addButton('scScraps',
-			{
-				title : 'Add a Scrap',
-				image : url + '/tinymce-assets/scraps.png',
-				cmd : 'mceScraps'
-			});
-            ed.addCommand('mceScraps', function() {
-                ed.windowManager.open({
-                    width : 400,
-                    height : 300,
-                    inline : 1
-                }, {
-                    plugin_url : url
-                });
-            });
+            ed.addCommand( 'mceScraps', function()
+                {
+                    ed.windowManager.open(
+                        {
+                            file : ajaxurl + '?action=scraps_tinymce_popup',
+                            id : "scScrapsPopup",
+                            width : 400,
+                            height : 280,
+                            inline : 1,
+                            title : ed.getLang("scScraps.dialog_title")
+                        }, {
+                            plugin_url : url,
+                            selectTxt : ed.selection.getContent( { format : 'html' } ),
+                            shortcode : '[scrap id="%VALUE1%" title="%VALUE2%"]'
+                        }
+                    );
+                }
+            );
+            ed.addButton( 'scScraps',
+                {
+                    title : ed.getLang("scScraps.button_title"),
+                    image : url + '/tinymce-assets/scraps.png',
+                    cmd : 'mceScraps'
+                }
+            );
 		},
 		createControl : function(n, cm) {
 			return null;
