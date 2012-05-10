@@ -35,4 +35,3 @@ require SC_SCRAPS_INCLUDES . 'class-api.php';
 require SC_SCRAPS_INCLUDES . 'api.php';
 
 sc_Scraps::on_load();
-?>

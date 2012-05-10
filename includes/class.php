@@ -15,6 +15,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
 // Only load class if it hasn't already been loaded
 if ( ! class_exists( 'sc_Scraps' ) )
 {
@@ -23,7 +24,7 @@ if ( ! class_exists( 'sc_Scraps' ) )
         /**
          * Sets up plugins hooks during initial load.
          */
-        static function on_load()
+        static public function on_load()
         {
             // Register Scraps CPT and Meta Boxes
             add_action( 'init', array( __CLASS__, 'register_scraps_cpt' ) );
@@ -38,17 +39,20 @@ if ( ! class_exists( 'sc_Scraps' ) )
             add_shortcode( 'scrap', 'sc_scraps_get_scrap' );
 
             // Setup language translations for TinyMCE plugin
-            add_filter( 'mce_external_languages', array( __CLASS__, 'mce_external_languages' ), 10, 1 );
+            add_filter( 'mce_external_languages', array( __CLASS__, 'mce_external_languages' ) );
 
             // Register AJAX load of Scraps popup
             add_action( 'wp_ajax_scraps_tinymce_popup', array( __CLASS__, 'tinymce_popup_content' ) );
+
+            // Register AJAX load of Scraps find
+            add_action( 'wp_ajax_scraps_find', array( __CLASS__, 'find_scrap_ajax' ) );
         }
 
 
         /**
          * Sets up Scraps CPT
          */
-        static function register_scraps_cpt()
+        static public function register_scraps_cpt()
         {
             $labels = array
             (
@@ -80,7 +84,7 @@ if ( ! class_exists( 'sc_Scraps' ) )
         /**
          * Loads up any needed styles and scripts for Scraps plugin
          */
-        static function register_scraps_styles()
+        static public function register_scraps_styles()
         {
             // Adds Scraps icon to admin sidebar. Replaces default pin icon.
             wp_enqueue_style( 'sc-scraps-icon', plugins_url( 'css/icon.css', SC_SCRAPS_PLUGIN_FILE ), array( "colors" ), '1.0', 'all' );
@@ -95,7 +99,7 @@ if ( ! class_exists( 'sc_Scraps' ) )
         /**
          * Register TinyMCE button for Scraps
          */
-        static function register_scraps_tinymce_buttons()
+        static public function register_scraps_tinymce_buttons()
         {
             if ( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) )
                 return;
@@ -111,7 +115,7 @@ if ( ! class_exists( 'sc_Scraps' ) )
         /**
          * Register TinyMCE Plugin
          */
-        static function scraps_tinymce_register($plugin_array)
+        static public function scraps_tinymce_register($plugin_array)
         {
             $plugin_array[ 'scScraps' ] = plugins_url( 'js/tinymce_button.js', SC_SCRAPS_PLUGIN_FILE );
             return $plugin_array;
@@ -120,26 +124,62 @@ if ( ! class_exists( 'sc_Scraps' ) )
         /**
          * Register TinyMCE button
          */
-        static function scraps_tinymce_add_button($buttons)
+        static public function scraps_tinymce_add_button($buttons)
         {
             array_push($buttons, "separator", "scScraps");
             return $buttons;
         }
 
 
-        static function mce_external_languages( $arr )
+        static public function mce_external_languages( $arr )
         {
             $arr[] = SC_SCRAPS_INCLUDES . 'tinymce_langs.php';
             return $arr;
         }
 
 
-        static function tinymce_popup_content()
+        static public function tinymce_popup_content()
         {
             wp_register_style( 'sc-scraps-tinymce_popup', plugins_url( 'css/tinymce_popup.css', SC_SCRAPS_PLUGIN_FILE ), array(), '1.0', 'all' );
             include( SC_SCRAPS_INCLUDES . 'tinymce_popup.php' );
             exit;
         }
+
+
+        static public function find_scrap_ajax()
+        {
+            $query = '';
+
+            if ( isset( $_GET[ 'q' ] ) )
+                $query = strtolower( $_GET[ 'q' ] );
+
+            if ( strlen( $query ) < 1 )
+                die;
+
+            $scraps = get_posts(
+                array(
+                    'post_type'                 => "sc-scraps",
+                    'suppress_filters'          => true,
+                    'update_post_term_cache'    => false,
+                    'update_post_meta_cache'    => false,
+                    'posts_per_page'            => 20,
+                    'search'                    => $query,
+                    's'                         => $query
+                )
+            );
+
+            if( ! $scraps )
+                die;
+
+            $output = array( );
+
+            foreach( $scraps as $scrap )
+                $output[] = $scrap->post_title . '|' . $scrap->ID;
+
+            $output = implode( "\n", $output );
+
+            die( $output );
+      	}
     }
 }
 ?>

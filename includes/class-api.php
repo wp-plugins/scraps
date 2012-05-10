@@ -16,15 +16,15 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Only load class if it hasn't already been loaded
-if ( ! class_exists( 'sc_ScrapsAPI' ) ) {
-
-	class sc_ScrapsAPI extends sc_Scraps {
-
+if ( ! class_exists( 'sc_ScrapsAPI' ) )
+{
+	class sc_ScrapsAPI extends sc_Scraps
+    {
         /**
          * Get content of a Scrap
          */
-        static function get_scrap( $args, $content ) {
-
+        static public function get_scrap( $args, $content )
+        {
             global $wpdb;
 
             $defaults = array(
@@ -59,10 +59,6 @@ if ( ! class_exists( 'sc_ScrapsAPI' ) ) {
                 return apply_filters( 'the_content', $output);
             else
                 return $output;
-            
         }
-
     }
-
 }
-?>
